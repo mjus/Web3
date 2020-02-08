@@ -54,17 +54,29 @@ public class BankClientService {
     }
 
     public boolean sendMoneyToClient(BankClient sender, String name, Long value) {
+        Connection connection = getMysqlConnection();
         try {
+            connection.setAutoCommit(false);
             BankClientDAO bankClientDAO = getBankClientDAO();
             if (bankClientDAO.isNameExiste(sender) && bankClientDAO.isClientHasSum(sender.getName(), value)) {
-                bankClientDAO.updateClientsMoney(sender.getName(), sender.getPassword(), (-1) * value);
+                bankClientDAO.updateClientsMoney(sender.getName(), sender.getPassword(), (- 1) * value);
                 bankClientDAO.updateClientsMoney(getClientByName(name).getName(), getClientByName(name).getPassword(), value);
+                connection.commit();
                 return true;
             } else {
                 return false;
             }
         } catch (NullPointerException | SQLException e) {
+            try {
+                connection.rollback();
+            } catch (SQLException ignore) {}
             return false;
+        } finally {
+            try {
+                connection.setAutoCommit(true);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }
 

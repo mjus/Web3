@@ -34,7 +34,8 @@ public class MoneyTransactionServlet extends HttpServlet {
         Map<String, Object> pageVariables = createPageVariablesMap(req);
 
         BankClient bc = bankClientService.getClientByName(senderName);
-        if (bc != null && isNumber(count) && bc.getPassword().equals(senderPass) && bankClientService.sendMoneyToClient(bc, nameTo, Long.parseLong(count))) {
+        if (bc != null && isNumber(count) && bc.getPassword().equals(senderPass)
+                && bankClientService.sendMoneyToClient(bc, nameTo, Long.parseLong(count))) {
             String message = "The transaction was successful";
             pageVariables.put("message", message);
             resp.getWriter().println(PageGenerator.getInstance().getPage("resultPage.html", pageVariables));
